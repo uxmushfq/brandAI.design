@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { getBrandBySlug, listBrandSlugs } from "@/lib/brand/query";
+import { getPublishedBrand } from "@/lib/brand/query";
+import { hasHubAccess } from "@/lib/auth/session";
 import { generateContext } from "@/lib/generate/context";
 import { generateDesignMd } from "@/lib/generate/design-md";
 import { generateTokensJson } from "@/lib/generate/tokens";
@@ -15,12 +16,9 @@ import { RulesSection } from "@/components/hub/RulesSection";
 import { AiSection } from "@/components/hub/AiSection";
 import { HubFooter } from "@/components/hub/HubFooter";
 import { Section } from "@/components/hub/Section";
+import { PasswordGate } from "./PasswordGate";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brandai.design";
-
-export function generateStaticParams() {
-  return listBrandSlugs().map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -28,9 +26,15 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const brand = getBrandBySlug(slug);
-  if (!brand) return { title: "Brand not found" };
+  const result = await getPublishedBrand(slug);
+  if (!result) return { title: "Brand not found" };
 
+  // A protected hub gives nothing away to a link preview either.
+  if (result.requiresPassword && !(await hasHubAccess(result.id))) {
+    return { title: "Protected brand guidelines", robots: { index: false } };
+  }
+
+  const { brand } = result;
   return {
     title: `${brand.name} — Brand guidelines`,
     description: brand.description,
@@ -44,13 +48,27 @@ export async function generateMetadata({
 
 export default async function BrandHubPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ wrong?: string }>;
 }) {
   const { slug } = await params;
-  const brand = getBrandBySlug(slug);
-  if (!brand) notFound();
+  const result = await getPublishedBrand(slug);
+  if (!result) notFound();
 
+  if (result.requiresPassword && !(await hasHubAccess(result.id))) {
+    const { wrong } = await searchParams;
+    return (
+      <PasswordGate
+        slug={slug}
+        studioName={result.brand.studio.name}
+        error={wrong ? "That password does not match. Check the message the studio sent you." : undefined}
+      />
+    );
+  }
+
+  const { brand } = result;
   const hubUrl = `${SITE_URL}/b/${brand.slug}`;
 
   // Pure functions over the same object the page renders, so the files a client

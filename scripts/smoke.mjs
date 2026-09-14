@@ -50,10 +50,12 @@ ok("context carries the rules", clip.includes("Never rotate, arch, or condense")
 ok("context has no orphan article bug", !/is coastal passenger/.test(clip));
 
 console.log("downloads");
+// The generated files are served by API routes now, so these are links with a
+// Content-Disposition rather than client-side blobs.
 async function grab(name) {
   const [download] = await Promise.all([
     page.waitForEvent("download", { timeout: 20000 }),
-    page.getByRole("button", { name }).click(),
+    page.getByRole("link", { name }).click(),
   ]);
   const path = await download.path();
   return { filename: download.suggestedFilename(), size: readFileSync(path).length, path };

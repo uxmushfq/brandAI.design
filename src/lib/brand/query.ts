@@ -1,20 +1,18 @@
-import { meridian } from "./fixtures";
-import type { Brand } from "./types";
+import "server-only";
+
+import { getPublicBrandBySlug, type PublicBrand } from "@/lib/db/brands";
+import { ensureSeeded } from "@/lib/db/seed";
 
 /**
- * The single data boundary.
+ * The single data boundary for the public hub.
  *
- * Today this reads a fixture. When Supabase lands it becomes a query that returns
- * the identical Brand shape, and nothing that consumes it has to change — that is
- * the entire reason the fixture went behind a function instead of being imported
- * straight into the page.
+ * It reads the file-backed store today and becomes a Supabase query returning the
+ * same shape later. Nothing downstream of here knows which.
  */
-const BRANDS: Brand[] = [meridian];
-
-export function getBrandBySlug(slug: string): Brand | null {
-  return BRANDS.find((brand) => brand.slug === slug) ?? null;
-}
-
-export function listBrandSlugs(): string[] {
-  return BRANDS.map((brand) => brand.slug);
+export async function getPublishedBrand(slug: string): Promise<PublicBrand | null> {
+  await ensureSeeded();
+  const result = getPublicBrandBySlug(slug);
+  // An unpublished brand is indistinguishable from one that does not exist.
+  if (!result || !result.published) return null;
+  return result;
 }

@@ -9,13 +9,15 @@
     "lint": "eslint",
     "assets": "node scripts/build-fixture-assets.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:studio": "node scripts/smoke-studio.mjs"
   },
   "dependencies": {
     "jszip": "^3.10.2",
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

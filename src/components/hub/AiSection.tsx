@@ -1,10 +1,6 @@
-"use client";
-
-import { useState } from "react";
 import type { Brand } from "@/lib/brand/types";
-import { downloadText, downloadZip } from "@/lib/download";
 import { formatBytes } from "@/lib/format";
-import { useCopy } from "@/lib/use-copy";
+import { CopyContext } from "./CopyContext";
 
 /**
  * Everything here is generated from the brand data above by pure functions, so a
@@ -22,31 +18,7 @@ export function AiSection({
   designMd: string;
   tokensJson: string;
 }) {
-  const { state, copy } = useCopy();
-  const [zipState, setZipState] = useState<"idle" | "working" | "failed">("idle");
-
   const assetBytes = brand.assets.reduce((sum, a) => sum + a.byteSize, 0);
-
-  async function handleZip() {
-    setZipState("working");
-    try {
-      await downloadZip(
-        [
-          ...brand.assets.map((asset) => ({
-            name: `assets/${asset.fileName}`,
-            url: asset.path,
-          })),
-          { name: "design.md", text: designMd },
-          { name: "tokens.json", text: tokensJson },
-          { name: "brand-context.txt", text: context },
-        ],
-        `${brand.slug}-brand-assets.zip`,
-      );
-      setZipState("idle");
-    } catch {
-      setZipState("failed");
-    }
-  }
 
   return (
     <div>
@@ -64,66 +36,30 @@ export function AiSection({
           </pre>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
-          <button
-            type="button"
-            onClick={() => void copy(context)}
-            className="cursor-pointer bg-ink px-5 py-2.5 text-small text-paper transition-opacity hover:opacity-85"
-          >
-            {state === "copied" ? (
-              <span className="animate-copy-in inline-block">
-                Copied to clipboard
-              </span>
-            ) : (
-              "Copy brand context"
-            )}
-          </button>
-          <span className="font-mono text-value text-graphite">
-            {context.length.toLocaleString("en-GB")} characters
-          </span>
-        </div>
-
-        {state === "failed" ? (
-          <p className="mt-3 text-small text-alert">
-            Your browser blocked the clipboard. Select the text above and press
-            Ctrl+C.
-          </p>
-        ) : null}
-
-        <span role="status" aria-live="polite" className="sr-only">
-          {state === "copied" ? "Brand context copied to clipboard" : ""}
-        </span>
+        <CopyContext context={context} />
       </div>
 
       <div className="mt-12">
         <FileRow
           name="design.md"
           description="For a code editor. Drop it beside your project and Cursor, Copilot or Claude Code will read the brand as context."
-          meta={formatBytes(new Blob([designMd]).size)}
+          meta={formatBytes(Buffer.byteLength(designMd))}
           action="Download design.md"
-          onClick={() => downloadText(designMd, "design.md", "text/markdown;charset=utf-8")}
+          href={`/api/brands/${brand.id}/design-md`}
         />
         <FileRow
           name="tokens.json"
           description="Colors and the type scale as design tokens, in the format Style Dictionary and Tokens Studio read."
-          meta={formatBytes(new Blob([tokensJson]).size)}
+          meta={formatBytes(Buffer.byteLength(tokensJson))}
           action="Download tokens.json"
-          onClick={() =>
-            downloadText(tokensJson, "tokens.json", "application/json;charset=utf-8")
-          }
+          href={`/api/brands/${brand.id}/tokens`}
         />
         <FileRow
           name="Everything"
           description="All logo files, plus design.md, tokens.json and the brand context, in one archive."
           meta={`${brand.assets.length} files, about ${formatBytes(assetBytes)}`}
-          action={zipState === "working" ? "Preparing the archive…" : "Download zip"}
-          disabled={zipState === "working"}
-          onClick={() => void handleZip()}
-          error={
-            zipState === "failed"
-              ? "The archive could not be built. Reload the page and try again, or download the files one at a time."
-              : null
-          }
+          action="Download zip"
+          href={`/api/brands/${brand.id}/export`}
         />
       </div>
     </div>
@@ -135,17 +71,13 @@ function FileRow({
   description,
   meta,
   action,
-  onClick,
-  disabled = false,
-  error = null,
+  href,
 }: {
   name: string;
   description: string;
   meta: string;
   action: string;
-  onClick: () => void;
-  disabled?: boolean;
-  error?: string | null;
+  href: string;
 }) {
   return (
     <div className="border-t border-rule py-6">
@@ -155,16 +87,13 @@ function FileRow({
       </div>
       <p className="measure mt-2 text-small text-graphite">{description}</p>
       <p className="mt-4">
-        <button
-          type="button"
-          onClick={onClick}
-          disabled={disabled}
-          className="cursor-pointer font-mono text-value underline decoration-rule underline-offset-4 transition-colors hover:decoration-ink disabled:cursor-default disabled:text-graphite disabled:no-underline"
+        <a
+          href={href}
+          className="font-mono text-value underline decoration-rule underline-offset-4 transition-colors hover:decoration-ink"
         >
           {action}
-        </button>
+        </a>
       </p>
-      {error ? <p className="mt-3 text-small text-alert">{error}</p> : null}
     </div>
   );
 }

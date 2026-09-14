@@ -1,11 +1,17 @@
 import Link from "next/link";
+
 import { Column, Frame } from "@/components/ui/Frame";
+import { currentStudio } from "@/lib/auth/session";
+import { ensureSeeded } from "@/lib/db/seed";
 
 /**
  * Placeholder. The marketing page is the last thing built, once the product has
  * settled enough to describe honestly.
  */
-export default function Home() {
+export default async function Home() {
+  await ensureSeeded();
+  const studio = await currentStudio();
+
   return (
     <main className="pt-24 pb-20">
       <Frame>
@@ -19,14 +25,20 @@ export default function Home() {
 
           <div className="mt-10 border-t border-rule pt-6">
             <p className="text-small text-graphite">
-              The marketing page comes last. For now, here is what a client sees.
+              The marketing page comes last. For now, the two sides of the product:
             </p>
-            <p className="mt-4">
+            <p className="mt-4 flex flex-wrap gap-4">
               <Link
                 href="/b/meridian"
-                className="inline-block bg-ink px-5 py-2.5 text-small text-paper transition-opacity hover:opacity-85"
+                className="inline-block bg-ink px-5 py-2.5 text-small text-paper"
               >
-                Open the Meridian Ferries hub
+                See a client&rsquo;s hub
+              </Link>
+              <Link
+                href={studio ? "/dashboard" : "/login"}
+                className="inline-block border border-rule px-5 py-2.5 text-small"
+              >
+                {studio ? "Your brands" : "Studio log in"}
               </Link>
             </p>
           </div>
