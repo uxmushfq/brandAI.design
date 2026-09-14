@@ -26,7 +26,7 @@ export const meridian: Brand = {
       fileName: "meridian-wordmark.svg",
       path: "/assets/meridian/meridian-wordmark.svg",
       mimeType: "image/svg+xml",
-      byteSize: 2914,
+      byteSize: 1718,
       category: "primary",
       previewOn: "light",
       usageDo:
@@ -40,7 +40,7 @@ export const meridian: Brand = {
       fileName: "meridian-wordmark-white.svg",
       path: "/assets/meridian/meridian-wordmark-white.svg",
       mimeType: "image/svg+xml",
-      byteSize: 2918,
+      byteSize: 1718,
       category: "primary",
       previewOn: "dark",
       usageDo:
@@ -54,7 +54,7 @@ export const meridian: Brand = {
       fileName: "meridian-lockup-stacked.svg",
       path: "/assets/meridian/meridian-lockup-stacked.svg",
       mimeType: "image/svg+xml",
-      byteSize: 3402,
+      byteSize: 2106,
       category: "secondary",
       previewOn: "light",
       usageDo:
@@ -68,7 +68,7 @@ export const meridian: Brand = {
       fileName: "meridian-mark.svg",
       path: "/assets/meridian/meridian-mark.svg",
       mimeType: "image/svg+xml",
-      byteSize: 1108,
+      byteSize: 401,
       category: "mark",
       previewOn: "light",
       usageDo:
@@ -82,7 +82,7 @@ export const meridian: Brand = {
       fileName: "meridian-mark.png",
       path: "/assets/meridian/meridian-mark.png",
       mimeType: "image/png",
-      byteSize: 8460,
+      byteSize: 17236,
       category: "mark",
       previewOn: "light",
       usageDo:

@@ -8,7 +8,7 @@
  *
  * Run with: node scripts/build-fixture-assets.mjs
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -154,3 +154,12 @@ await sharp(Buffer.from(files["meridian-mark.svg"]))
   .png()
   .toFile(join(OUT, "meridian-mark.png"));
 console.log("wrote meridian-mark.png (512x512)");
+
+// The fixture carries byteSize by hand, because the real table will carry it as a
+// column rather than reading the disk. Print the numbers so they are easy to keep
+// honest — a size on screen that disagrees with the download is a small lie.
+console.log("\nbyteSize values for src/lib/brand/fixtures.ts:");
+for (const name of [...Object.keys(files), "meridian-mark.png"]) {
+  if (name === "ropewalk-studio.svg") continue;
+  console.log(`  ${name}: ${statSync(join(OUT, name)).size}`);
+}

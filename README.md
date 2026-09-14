@@ -57,11 +57,16 @@ band has the contrast headroom to afford it.
 ```bash
 npm run assets           # regenerate the Meridian fixture artwork into public/
 npm run check:contrast   # render a hub and assert every text node meets WCAG AA
+npm run smoke            # clipboard, the three generated files, the zip, focus, motion
 ```
 
-`check:contrast` needs a running server and a Chromium. Pass a URL as the first
-argument, and set `PLAYWRIGHT_CHROMIUM` if your browser is not where Playwright
-expects it.
+The last two need a running server and a Chromium. Pass a URL as the first argument,
+and set `PLAYWRIGHT_CHROMIUM` if your browser is not where Playwright expects it:
+
+```bash
+npm run build && npm run start
+npm run smoke -- http://localhost:3000/b/meridian
+```
 
 ## Not in V1
 
