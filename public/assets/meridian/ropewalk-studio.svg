@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Ropewalk Studio">
+  <title>Ropewalk Studio</title>
+  <g fill="currentColor">
+    <path d="M6,6 H28 L24,11 H2 Z"/>
+    <path d="M8,13 H26 L22,18 H4 Z"/>
+    <path d="M10,20 H24 L20,25 H6 Z"/>
+  </g>
+</svg>

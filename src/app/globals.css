@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/*
+  The frame has no color of its own. Every hue on a brand hub belongs to the brand;
+  our chrome is paper, ink, and one hairline. That is deference, but it is also
+  accuracy — you cannot judge a palette on a tinted ground.
+*/
+@theme {
+  --color-paper: #f1f2f3;
+  --color-sheet: #ffffff;
+  --color-ink: #15171b;
+  --color-graphite: #5a6068;
+  --color-rule: #d7dadd;
+  --color-alert: #a3231c;
+
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Weights 400 and 500 only. There is no bold in this interface. */
+  --text-display: clamp(2.5rem, 1.15rem + 5.6vw, 4rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.03em;
+
+  --text-h1: clamp(1.875rem, 1.3rem + 2.4vw, 2.5rem);
+  --text-h1--line-height: 1.08;
+  --text-h1--letter-spacing: -0.022em;
+
+  --text-h2: 1.625rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.015em;
+
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.01em;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+
+  --text-value: 0.8125rem;
+  --text-value--line-height: 1.4;
+  --text-value--letter-spacing: 0.01em;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* The margin index links into sections; don't jam them against the viewport edge. */
+    scroll-padding-top: 2rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Focus is ink and geometry, never a hue that would compete with the brand. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility measure {
+  /* Body line length under 80 characters, per the brief. */
+  max-width: 68ch;
+}
+
+/*
+  The margin index sits beside the reading column, not inside it — the color bands
+  run full width between sections, so a sticky element nested in the column would
+  have to be broken out of it. Fixed to the same gutter the frame uses instead.
+  (100vw ignores the scrollbar, which puts this within a few pixels of the column
+  edge rather than exactly on it. Not worth a layout-shifting measurement to fix.)
+*/
+.margin-index {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .margin-index {
+    position: fixed;
+    top: 4.5rem;
+    left: calc(
+      max(2.5rem, (100vw - 1180px) / 2 + 2.5rem) + 680px + 3rem
+    );
+    display: block;
+    width: 11rem;
+  }
+}
+
+/*
+  The page's one motion: a copy answering the click that asked for it.
+  Nothing animates on scroll and nothing animates on load.
+*/
+@keyframes copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-copy-in {
+  animation: copy-in 140ms cubic-bezier(0.2, 0, 0.1, 1);
+}
+
+@keyframes edge-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility animate-edge-draw {
+  animation: edge-draw 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left;
+}
